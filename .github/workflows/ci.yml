@@ -1,0 +1,49 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  brain-function:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: supabase/functions/brain
+    steps:
+      - uses: actions/checkout@v4
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+      - name: deno check
+        run: deno check index.ts
+      - name: deno fmt --check
+        run: deno fmt --check .
+      - name: deno lint
+        run: deno lint .
+
+  manager-app:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: app
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: app/package-lock.json
+      - name: npm ci
+        run: npm ci
+      - name: typecheck
+        run: npx tsc --noEmit
+      - name: build app and generated resource
+        run: npm run build
+      - name: generated resource is committed
+        working-directory: .
+        run: git diff --exit-code -- supabase/functions/brain/ui/manager_html.ts

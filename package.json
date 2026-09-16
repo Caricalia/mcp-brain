@@ -1,0 +1,13 @@
+{
+  "name": "mcp-brain",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "dev": "supabase functions serve --no-verify-jwt brain --env-file supabase/functions/.env",
+    "deploy": "supabase functions deploy --no-verify-jwt brain",
+    "build:app": "cd app && npm ci && npm run build"
+  },
+  "devDependencies": {
+    "supabase": "^2.54.11"
+  }
+}
